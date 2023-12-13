@@ -20,6 +20,7 @@ const Layout = ({ children }) => {
                             <ul className="navbar-nav flex-grow-1">
                                 {!user && <li className='nav-item'><Link to='/signup' className='nav-link text-light'>Sign Up</Link></li>}
                                 {!user && <li className='nav-item'><Link to='/login' className='nav-link text-light'>Login</Link></li>}
+                                <li className='nav-item'><Link to='/viewall' className='nav-link text-light'>View All</Link></li>
                                 {!!user && <li className='nav-item'><Link to='/logout' className='nav-link text-light'>Logout</Link></li>}
                             </ul>
                         </div>

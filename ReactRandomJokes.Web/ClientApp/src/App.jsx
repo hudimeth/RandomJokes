@@ -6,6 +6,7 @@ import LogIn from './Pages/LogIn';
 import SignUp from './Pages/SignUp';
 import LogOut from './Pages/LogOut';
 import { AuthContextComponent } from './Components/AuthContextComponent';
+import ViewAll from './Pages/ViewAll';
 
 const App = () => {
     return (
@@ -16,6 +17,7 @@ const App = () => {
                     <Route exact path='/signup' element={<SignUp />} />
                     <Route exact path='/login' element={<LogIn />} />
                     <Route exact path='/logout' element={<LogOut />} />
+                    <Route exact path='/viewall' element={<ViewAll/> }/>
                 </Routes>
             </Layout>
         </AuthContextComponent>

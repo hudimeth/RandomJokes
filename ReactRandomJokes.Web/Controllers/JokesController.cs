@@ -67,28 +67,46 @@ namespace ReactRandomJokes.Web.Controllers
         }
 
         [HttpGet]
-        [Route("getjokelikeforuser")]
-        public UserJokeLike GetJokeLikeForUser(int userId, int jokeId)
+        [AllowAnonymous]
+        [Route("getinteractionstatus")]
+        public InteractionStatusViewModel GetInteractionStatus(int jokeId)
         {
-            var repo = new JokesRepo(_connectionString);
-            return repo.GetJokeLikeForUser(userId, jokeId);
+            if (!User.Identity.IsAuthenticated)
+            {
+                return new()
+                {
+                    Status = InteractionStatus.Unauthenticated
+                };
+            }
+            var userRepo = new UsersRepo(_connectionString);
+            var user = userRepo.GetByEmail(User.Identity.Name);
+            var jokeRepo = new JokesRepo(_connectionString);
+            var joke = jokeRepo.GetJokeWithLikes(jokeId);
+            var jokeLike = joke.UserJokeLikes.FirstOrDefault(like => like.UserId == user.Id);
+            if (jokeLike == null)
+            {
+                return new()
+                {
+                    Status = InteractionStatus.NeverInteracted
+                };
+            }
+            if (jokeLike.Time.AddMinutes(5) < DateTime.Now)
+            {
+                return new()
+                {
+                    Status = InteractionStatus.CanNoLongerInteract
+                };
+            }
+            return jokeLike.Liked ? new() { Status = InteractionStatus.Liked } : new() { Status = InteractionStatus.Disliked };
         }
 
         [HttpGet]
-        [Route("jokelikes/{jokeId}")]
-        public List<UserJokeLike> GetJokeLikesForJoke(int jokeId)
+        [AllowAnonymous]
+        [Route("getall")]
+        public List<Joke> GetAllJokes()
         {
             var repo = new JokesRepo(_connectionString);
-            return repo.GetLikesForJoke(jokeId);
+            return repo.GetAllJokes();
         }
-
-        //[HttpPost]
-        //[Route("updatelikeforjoke")]
-        //public void UpdateLikeForJoke(UserJokeLike like)
-        //{
-        //    var repo = new JokesRepo(_connectionString);
-        //    repo.UpdateLikeForJoke(like);
-        //}
-
     }
 }

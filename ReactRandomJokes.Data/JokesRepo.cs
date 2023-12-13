@@ -25,6 +25,11 @@ namespace ReactRandomJokes.Data
             context.Jokes.Add(joke);
             context.SaveChanges();
         }
+        public List<Joke> GetAllJokes()
+        {
+            var context = new RandomJokesDbContext(_connectionString);
+            return context.Jokes.Include(j => j.UserJokeLikes).ToList();
+        }
 
         public bool JokeIsInDb(int jokeOriginalId)
         {
@@ -34,7 +39,7 @@ namespace ReactRandomJokes.Data
         public Joke GetJokeByOriginalId(int jokeOriginalId)
         {
             var context = new RandomJokesDbContext(_connectionString);
-            return context.Jokes.Include(j => j.UserJokeLikes).FirstOrDefault(j => j.OriginalId == jokeOriginalId);
+            return context.Jokes.FirstOrDefault(j => j.OriginalId == jokeOriginalId);
         }
         public List<UserJokeLike> GetLikesForJoke(int id)
         {
@@ -47,37 +52,6 @@ namespace ReactRandomJokes.Data
             var context = new RandomJokesDbContext(_connectionString);
             return context.UserJokeLikes.Any(l => l.JokeId == jokeId);
         }
-
-        //public int GetLikesForJoke(int jokeId)
-        //{
-        //    var context = new RandomJokesDbContext(_connectionString);
-        //    //var jokeLike2 = context.UserJokeLikes.FromSqlInterpolated($"Select Count(*) as Likes from UserJokeLikes Where JokeId ={jokeId} Group by JokeId");
-
-        //    if (!JokeHasLikes(jokeId))
-        //    {
-        //        return 0;
-        //    }
-        //    var jokeLike = context.UserJokeLikes.GroupBy(j => j.JokeId).Where(j => j.Key == jokeId && j.All(l => l.Liked == true)).Select(l => new JokeLike
-        //    {
-        //        Likes = l.Count()
-        //    }).ToList();
-        //    return jokeLike[0].Likes;
-        //}
-        //public int GetDislikesForJoke(int jokeId)
-        //{
-        //    var context = new RandomJokesDbContext(_connectionString);
-        //    //var jokeLike2 = context.UserJokeLikes.FromSqlInterpolated($"Select Count(*) as Likes from UserJokeLikes Where JokeId ={jokeId} Group by JokeId");
-
-        //    if (!JokeHasLikes(jokeId))
-        //    {
-        //        return 0;
-        //    }
-        //    var jokeLike = context.UserJokeLikes.GroupBy(j => j.JokeId).Where(j => j.Key == jokeId && j.All(l => l.Liked == false)).Select(l => new JokeDislike
-        //    {
-        //        Dislikes = l.Count()
-        //    }).ToList();
-        //    return jokeLike[0].Dislikes;
-        //}
 
         public void AddLikeForJoke(int userId, int jokeId, bool liked)
         {
@@ -106,6 +80,11 @@ namespace ReactRandomJokes.Data
         {
             var context = new RandomJokesDbContext(_connectionString);
             return context.UserJokeLikes.FirstOrDefault(l => l.UserId == userId && l.JokeId == jokeId);
+        }
+        public Joke GetJokeWithLikes(int jokeId)
+        {
+            var context = new RandomJokesDbContext(_connectionString);
+            return context.Jokes.Include(j => j.UserJokeLikes).FirstOrDefault(j => j.Id == jokeId);
         }
     }
 }
